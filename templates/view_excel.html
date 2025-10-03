@@ -1,0 +1,373 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Excel Files - Exporter Finder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin: 20px 40px;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .actions-section {
+            padding: 30px 40px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(40, 167, 69, 0.4);
+        }
+
+        .action-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .excel-files-section {
+            padding: 40px;
+        }
+
+        .excel-files-section h2 {
+            color: #333;
+            font-size: 1.8em;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        #excelFilesList {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .excel-file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .excel-file-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+        }
+
+        .excel-file-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .excel-file-name {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 1.1em;
+            word-break: break-all;
+        }
+
+        .excel-file-meta {
+            font-size: 0.9em;
+            color: #777;
+        }
+
+        .download-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+
+        .download-btn:hover {
+            background: linear-gradient(135deg, #556cd6 0%, #653ba2 100%);
+            transform: translateY(-1px);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2em;
+            color: #667eea;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 20px 40px;
+            border-left: 4px solid #28a745;
+            display: none;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 20px 40px;
+            border-left: 4px solid #dc3545;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Excel Files Manager</h1>
+            <p>View, download, and manage all your exported data</p>
+        </div>
+
+        <a href="/" class="back-button">← Back to Search</a>
+
+        <div id="successMessage" class="success-message"></div>
+        <div id="errorMessage" class="error-message"></div>
+
+        <div class="actions-section">
+            <h3 style="margin-bottom: 15px; color: #333;">Actions</h3>
+            <div class="action-buttons">
+                <button class="action-btn" onclick="createCombinedExcel()" id="createCombinedBtn">
+                    📋 Create Combined Excel Sheet
+                </button>
+                <button class="action-btn" onclick="downloadAllExcels()" id="downloadAllBtn">
+                    📥 Download All Files
+                </button>
+                <button class="action-btn" onclick="loadExcelFiles()">
+                    🔄 Refresh List
+                </button>
+            </div>
+        </div>
+
+        <div class="excel-files-section">
+            <h2>Available Excel Files</h2>
+            <div id="loadingIndicator" class="loading">
+                <div class="spinner"></div>
+                <div>Loading Excel files...</div>
+            </div>
+            <div id="excelFilesList"></div>
+        </div>
+    </div>
+
+    <script>
+        function loadExcelFiles() {
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const list = document.getElementById('excelFilesList');
+            
+            loadingIndicator.style.display = 'block';
+            list.innerHTML = '';
+
+            fetch('/excel_files')
+                .then(response => response.json())
+                .then(files => {
+                    loadingIndicator.style.display = 'none';
+                    
+                    if (files.length === 0) {
+                        list.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;">No Excel files found. Start by making some searches!</div>';
+                        return;
+                    }
+
+                    list.innerHTML = files.map(file => `
+                        <div class="excel-file-item">
+                            <div class="excel-file-info">
+                                <div class="excel-file-name">${file.name}</div>
+                                <div class="excel-file-meta">Size: ${file.size} | Modified: ${file.modified}</div>
+                            </div>
+                            <a href="/download/${file.name}" class="download-btn">⬇ Download</a>
+                        </div>
+                    `).join('');
+                })
+                .catch(err => {
+                    loadingIndicator.style.display = 'none';
+                    showError('Error loading Excel files: ' + err.message);
+                });
+        }
+
+        function createCombinedExcel() {
+            const btn = document.getElementById('createCombinedBtn');
+            const originalText = btn.textContent;
+            
+            btn.disabled = true;
+            btn.textContent = '⏳ Creating combined file...';
+
+            fetch('/create_combined_excel')
+                .then(response => response.json())
+                .then(data => {
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                    
+                    if (data.error) {
+                        showError(data.error);
+                    } else {
+                        showSuccess(`Combined Excel file created successfully with ${data.total_records} records!`);
+                        loadExcelFiles(); // Refresh the list
+                        
+                        // Auto-download the combined file
+                        setTimeout(() => {
+                            window.location.href = `/download/${data.filename}`;
+                        }, 1000);
+                    }
+                })
+                .catch(err => {
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                    showError('Error creating combined Excel: ' + err.message);
+                });
+        }
+
+        function downloadAllExcels() {
+            fetch('/excel_files')
+                .then(response => response.json())
+                .then(files => {
+                    if (files.length === 0) {
+                        showError('No files to download');
+                        return;
+                    }
+
+                    showSuccess(`Downloading ${files.length} files...`);
+                    
+                    files.forEach((file, index) => {
+                        setTimeout(() => {
+                            const link = document.createElement('a');
+                            link.href = `/download/${file.name}`;
+                            link.download = file.name;
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                        }, index * 500); // Stagger downloads
+                    });
+                })
+                .catch(err => {
+                    showError('Error downloading files: ' + err.message);
+                });
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            const errorDiv = document.getElementById('errorMessage');
+            
+            errorDiv.style.display = 'none';
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            const successDiv = document.getElementById('successMessage');
+            
+            successDiv.style.display = 'none';
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Load files on page load
+        document.addEventListener('DOMContentLoaded', loadExcelFiles);
+    </script>
+</body>
+</html>

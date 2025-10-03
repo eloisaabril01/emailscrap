@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exporter Finder - Professional Business Search</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .search-section {
+            padding: 40px;
+            background: #f8f9fa;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 15px;
+            max-width: 900px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 300px;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .limit-input {
+            width: 100px;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .search-btn {
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .stop-btn {
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: none;
+        }
+
+        .stop-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(220, 53, 69, 0.4);
+        }
+
+        .stop-btn.active {
+            display: inline-block;
+        }
+
+        .results-section {
+            padding: 40px;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .results-header h2 {
+            color: #333;
+            font-size: 1.8em;
+        }
+
+        .results-count {
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .results-table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .results-table th {
+            padding: 18px 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .results-table td {
+            padding: 18px 15px;
+            border-bottom: 1px solid #f0f0f0;
+            color: #333;
+        }
+
+        .results-table tbody tr {
+            transition: background-color 0.2s;
+        }
+
+        .results-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .website-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            word-break: break-all;
+        }
+
+        .website-link:hover {
+            text-decoration: underline;
+        }
+
+        .no-website {
+            color: #999;
+            font-style: italic;
+        }
+
+        .email-list {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .email {
+            color: #667eea;
+            font-size: 14px;
+        }
+
+        .no-data {
+            color: #999;
+        }
+
+        .progress-container {
+            display: none;
+            padding: 30px 40px;
+            background: #f8f9fa;
+            text-align: center;
+        }
+
+        .progress-container.active {
+            display: block;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 1.2em;
+            color: #667eea;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .new-row {
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .excel-files-section {
+            padding: 40px;
+            background: #f8f9fa;
+        }
+
+        .excel-files-section h2 {
+            color: #333;
+            font-size: 1.8em;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        #excelFilesList {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .excel-file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .excel-file-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+        }
+
+        .excel-file-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .excel-file-name {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 1.1em;
+            word-break: break-all;
+        }
+
+        .excel-file-meta {
+            font-size: 0.9em;
+            color: #777;
+        }
+
+        .download-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+
+        .download-btn:hover {
+            background: linear-gradient(135deg, #556cd6 0%, #653ba2 100%);
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1>🌍 Exporter Finder</h1>
+                    <p>Find exporters and businesses with complete contact information</p>
+                </div>
+                <a href="/view_excel" style="padding: 12px 25px; background: rgba(255, 255, 255, 0.2); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; border: 2px solid white; transition: all 0.3s; backdrop-filter: blur(10px);" onmouseover="this.style.background='white'; this.style.color='#667eea';" onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'; this.style.color='white';">
+                    📂 View Excel Files
+                </a>
+            </div>
+        </div>
+
+        <div class="search-section">
+            <form method="post" class="search-form" id="searchForm">
+                <input type="text" name="query" class="search-input" placeholder="Search for exporters (e.g., Rice Exporters in Delhi)" required>
+                <input type="number" name="limit" class="limit-input" value="10" min="1" max="20" placeholder="Limit">
+                <button type="submit" class="search-btn" id="searchBtn">🔍 Search</button>
+                <button type="button" class="stop-btn" id="stopBtn">⏹ Stop</button>
+            </form>
+        </div>
+
+        <div class="progress-container" id="progressContainer">
+            <div class="spinner"></div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">Initializing...</div>
+        </div>
+
+        <div class="results-section" id="resultsSection" style="display: none;">
+            <div class="results-header">
+                <h2>Search Results (Live)</h2>
+                <span class="results-count" id="resultsCount">0 verified</span>
+            </div>
+
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">Name</th>
+                        <th style="width: 25%;">Address</th>
+                        <th style="width: 20%;">Website</th>
+                        <th style="width: 15%;">Phone</th>
+                        <th style="width: 20%;">Emails</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsBody">
+                </tbody>
+            </table>
+
+            <div style="margin-top: 40px; padding: 30px; background: #f8f9fa; border-radius: 8px;" id="emailSection">
+                <h3 style="color: #667eea; margin-bottom: 20px; font-size: 1.5em;">📧 All Email Addresses</h3>
+                <div style="background: white; padding: 20px; border-radius: 8px; font-family: 'Courier New', monospace; line-height: 2;" id="emailList">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="excel-files-section" id="excelFilesSection" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <h2 style="margin: 0;">📊 Exported Excel Files</h2>
+            <a href="/view_excel" style="padding: 12px 25px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: 600; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 25px rgba(40, 167, 69, 0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                📂 View All Excel Files
+            </a>
+        </div>
+        <div id="excelFilesList"></div>
+    </div>
+
+    <script>
+        const form = document.getElementById('searchForm');
+        const progressContainer = document.getElementById('progressContainer');
+        const resultsSection = document.getElementById('resultsSection');
+        const resultsBody = document.getElementById('resultsBody');
+        const resultsCount = document.getElementById('resultsCount');
+        const emailList = document.getElementById('emailList');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+
+        let progressInterval;
+        let resultsInterval;
+        let displayedResults = new Set();
+        let allEmails = [];
+
+        function updateProgress(data) { // Added data parameter
+            const percentage = data.total > 0 ? (data.current / data.total * 100) : 0;
+            progressFill.style.width = percentage + '%';
+            progressText.textContent = data.status;
+        }
+
+        function createResultRow(result) {
+            const row = document.createElement('tr');
+            row.className = 'new-row';
+
+            const websiteHtml = result.website
+                ? `<a href="${result.website}" target="_blank" class="website-link">${result.website.substring(0, 50)}${result.website.length > 50 ? '...' : ''}</a>`
+                : '<span class="no-website">None</span>';
+
+            const phoneHtml = result.phone && result.phone !== 'N/A'
+                ? result.phone
+                : '<span class="no-data">N/A</span>';
+
+            const emailsHtml = result.emails && result.emails.length > 0
+                ? `<div class="email-list">${result.emails.map(e => `<span class="email">📧 ${e}</span>`).join('')}</div>`
+                : '<span class="no-data">No emails found</span>';
+
+            row.innerHTML = `
+                <td><strong>${result.name}</strong></td>
+                <td>${result.address}</td>
+                <td>${websiteHtml}</td>
+                <td>${phoneHtml}</td>
+                <td>${emailsHtml}</td>
+            `;
+
+            return row;
+        }
+
+        function updateResults(results) { // Added results parameter
+            results.forEach((result, index) => {
+                const resultKey = `${result.name}|${result.address}`;
+
+                if (!displayedResults.has(resultKey)) {
+                    displayedResults.add(resultKey);
+
+                    // Add to table
+                    const row = createResultRow(result);
+                    resultsBody.appendChild(row);
+
+                    // Add emails to list
+                    if (result.emails && result.emails.length > 0) {
+                        result.emails.forEach(email => {
+                            if (!allEmails.includes(email)) {
+                                allEmails.push(email);
+                                const emailDiv = document.createElement('div');
+                                emailDiv.textContent = email;
+                                emailList.appendChild(emailDiv);
+                            }
+                        });
+                    }
+
+                    // Update count
+                    resultsCount.textContent = `${displayedResults.size} verified`;
+                }
+            });
+
+            if (results.length > 0 && resultsSection.style.display === 'none') {
+                resultsSection.style.display = 'block';
+            }
+        }
+
+        // Load Excel files on page load
+        function loadExcelFiles() {
+            fetch('/excel_files')
+                .then(response => response.json())
+                .then(files => {
+                    const section = document.getElementById('excelFilesSection');
+                    const list = document.getElementById('excelFilesList');
+
+                    if (files.length > 0) {
+                        section.style.display = 'block';
+                        list.innerHTML = files.map(file => `
+                            <div class="excel-file-item">
+                                <div class="excel-file-info">
+                                    <div class="excel-file-name">${file.name}</div>
+                                    <div class="excel-file-meta">Size: ${file.size} | Modified: ${file.modified}</div>
+                                </div>
+                                <a href="/download/${file.name}" class="download-btn">⬇ Download</a>
+                            </div>
+                        `).join('');
+                    } else {
+                        section.style.display = 'none';
+                    }
+                })
+                .catch(err => console.error('Error loading Excel files:', err));
+        }
+
+        // Load files on page load
+        document.addEventListener('DOMContentLoaded', loadExcelFiles);
+
+
+        const stopBtn = document.getElementById('stopBtn');
+        const searchBtn = document.getElementById('searchBtn');
+
+        function stopSearch() {
+            fetch('/stop', { method: 'POST' })
+                .then(() => {
+                    progressText.textContent = 'Stopping search...';
+                    stopBtn.classList.remove('active');
+                    searchBtn.disabled = false;
+                    clearInterval(progressInterval);
+                    clearInterval(resultsInterval);
+                    setTimeout(() => {
+                        progressContainer.classList.remove('active');
+                    }, 2000);
+                });
+        }
+
+        stopBtn.addEventListener('click', stopSearch);
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent page reload
+
+            // Reset everything
+            displayedResults.clear();
+            allEmails = [];
+            resultsBody.innerHTML = '';
+            emailList.innerHTML = '';
+            resultsSection.style.display = 'none';
+            resultsCount.textContent = '0 verified';
+
+            // Show progress and stop button
+            progressContainer.classList.add('active');
+            stopBtn.classList.add('active');
+            searchBtn.disabled = true;
+            progressFill.style.width = '0%';
+            progressText.textContent = 'Starting search...';
+
+            // Get form data
+            const formData = new FormData(form);
+
+            // Submit search via AJAX
+            fetch('/', {
+                method: 'POST',
+                body: formData
+            }).then(() => {
+                // Start polling
+                progressInterval = setInterval(() => {
+                    fetch('/progress')
+                        .then(response => response.json())
+                        .then(data => {
+                            updateProgress(data);
+                        });
+
+                    fetch('/results')
+                        .then(response => response.json())
+                        .then(data => {
+                            updateResults(data);
+                        });
+                }, 2000); // Poll every 2 seconds (reduced from 1 second)
+            });
+        });
+
+        {% if streaming %}
+        // If we're streaming, start polling immediately
+        progressContainer.classList.add('active');
+        progressInterval = setInterval(() => {
+            fetch('/progress')
+                .then(response => response.json())
+                .then(data => {
+                    updateProgress(data);
+                });
+
+            fetch('/results')
+                .then(response => response.json())
+                .then(data => {
+                    updateResults(data);
+                });
+        }, 2000); // Poll every 2 seconds
+
+        // Update the statusDiv variable to correctly reference the progressText element
+        const statusDiv = document.getElementById('progressText');
+
+        // When the search is complete, stop polling and show the final message
+        // This part assumes there's a way to know when streaming is done, e.g., a specific status message or an event.
+        // For demonstration, let's assume the /progress endpoint might return a 'done' status.
+        // A more robust solution might involve a dedicated '/search_complete' endpoint.
+        let completionCheckInterval = setInterval(() => {
+            fetch('/progress')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status.includes('✓') || data.status.toLowerCase().includes('complete') || data.status.toLowerCase().includes('stopped')) {
+                        clearInterval(progressInterval);
+                        clearInterval(resultsInterval);
+                        clearInterval(completionCheckInterval);
+
+                        // Hide stop button, enable search
+                        stopBtn.classList.remove('active');
+                        searchBtn.disabled = false;
+
+                        // Show final message
+                        statusDiv.textContent = data.status;
+                        statusDiv.style.color = '#4CAF50';
+
+                        // Reload Excel files list
+                        loadExcelFiles();
+                    }
+                })
+                .catch(err => {
+                    console.error('Error checking completion status:', err);
+                    clearInterval(completionCheckInterval);
+                });
+        }, 1000);
+        {% endif %}
+    </script>
+</body>
+</html>
